@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+# vim:et:sta:sts=4:sw=4:ts=8:tw=79:
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function
+import sys
+import os.path
+
+def splitdeps(deps):
+    splitdeps = deps.split(',')
+    for i in splitdeps:
+        i = i.strip()
+    splitdeps[:] = [i for i in splitdeps if i != '']
+    return ','.join('"{0}"'.format(x) for x in splitdeps)
+
+if len(sys.argv) != 2:
+    print("ERROR: you have to provide the path to a PACKAGES.TXT file")
+    sys.exit(1)
+
+pkgtxt = sys.argv[1]
+
+if not os.path.isfile(pkgtxt):
+    print("ERROR: file {} not found.".format(pkgtxt))
+    sys.exit(1)
+
+print('{"packages": [')
+
+with open(pkgtxt, "r") as f:
+    readDescription1stLine = False
+    readingDescription = False
+    firstOne = True
+    pkgname = ''
+    descriptionShort = ''
+    descriptionLong = ''
+    for line in f:
+        if line.startswith('PACKAGE NAME:'):
+            readDescription1stLine = False
+            readingDescription = False
+            descriptionShort = ''
+            descriptionLong = ''
+            if not firstOne:
+                print(",")
+            print('{')
+            firstOne = False
+            pkgNameFull = line.replace('PACKAGE NAME:', '')
+            pkgNameFull = pkgNameFull.strip().rsplit('.', 1)[0].rsplit('-', 3)
+            pkgname, pkgver, pkgarch, pkgrel = pkgNameFull
+            print('"name": "{}",'.format(pkgname))
+            print('"ver": "{}",'.format(pkgver))
+            print('"arch": "{}",'.format(pkgarch))
+            print('"rel": "{}",'.format(pkgrel))
+        elif line.startswith('PACKAGE LOCATION:'):
+            location = line.replace('PACKAGE LOCATION:', '').strip()
+            print('"loc": "{}",'.format(location))
+        elif line.startswith('PACKAGE SIZE (compressed):'):
+            sizec = line.replace('PACKAGE SIZE (compressed):', '').strip()
+            print('"sizec": "{}",'.format(sizec))
+        elif line.startswith('PACKAGE SIZE (uncompressed):'):
+            sizeu = line.replace('PACKAGE SIZE (uncompressed):', '').strip()
+            print('"sizeu": "{}",'.format(sizeu))
+        elif line.startswith('PACKAGE REQUIRED:'):
+            deps = line.replace('PACKAGE REQUIRED:', '').strip()
+            deps = splitdeps(deps)
+            if len(deps) > 0:
+                print('"deps": [{}],'.format(deps))
+        elif line.startswith('PACKAGE CONFLICTS:'):
+            deps = line.replace('PACKAGE CONFLICTS:', '').strip()
+            deps = splitdeps(deps)
+            if len(deps) > 0:
+                print('"con": [{}],'.format(deps))
+        elif line.startswith('PACKAGE SUGGESTS:'):
+            deps = line.replace('PACKAGE SUGGESTS:', '').strip()
+            deps = splitdeps(deps)
+            if len(deps) > 0:
+                print('"sug": [{}],'.format(deps))
+        elif line.startswith('PACKAGE DESCRIPTION:'):
+            readingDescription = True
+        elif line.startswith('{}:'.format(pkgname)):
+            descline = line.replace('{}:'.format(pkgname), '').strip()
+            descline = descline.replace('"', "'")
+            if readingDescription:
+                if readDescription1stLine:
+                    descriptionLong = descriptionLong + descline + ' '
+                else:
+                    descriptionShort = descline
+                    print('"descs": "{}",'.format(descriptionShort))
+                    readDescription1stLine = True
+        elif line == '\n':
+            if readingDescription:
+                descriptionLong = descriptionLong.strip()
+                print('"descl": "{}"'.format(descriptionLong))
+                readingDescription = False
+                readDescription1stLine = False
+                print('}', end ='')
+
+print(']}')
