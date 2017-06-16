@@ -5,6 +5,7 @@
 from __future__ import print_function
 import sys
 import os.path
+import json
 
 def splitdeps(deps):
     splitdeps = deps.split(',')
@@ -142,4 +143,16 @@ with open(pkgtxt, "r") as f:
                 readDescription1stLine = False
                 print('}', end ='')
 
-print(']}')
+print('],')
+
+
+locations = set(locations)
+used_locations = {}
+print('"locations": ')
+
+for l in locations:
+    used_locations[l] = locdesc[l]
+
+print(json.dumps(used_locations))
+
+print('}')
