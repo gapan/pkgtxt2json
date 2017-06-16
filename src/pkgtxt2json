@@ -149,4 +149,4 @@ for l in locations:
     used_locations[l] = locdesc[l]
 pkgdict["locations"] = used_locations
 
-print(json.dumps(pkgdict))
+print(json.dumps(pkgdict, ensure_ascii=False))
