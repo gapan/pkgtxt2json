@@ -34,6 +34,7 @@ locdesc = {
     "f" : "FAQs, HOWTOs, and other miscellaneous documentation",
     "games" : "Games :)",
     "gnome" : "Applications and libraries from the Gnome project",
+    "k" : "Linux kernel",
     "kde" : "KDE applications (depending on kdelibs)",
     "kdei" : "Localisation packages for KDE applications",
     "l" : "Libraries",
