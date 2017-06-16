@@ -98,6 +98,8 @@ with open(pkgtxt, "r") as f:
             print('"rel": "{}",'.format(pkgrel))
         elif line.startswith('PACKAGE LOCATION:'):
             location = line.replace('PACKAGE LOCATION:', '').strip()
+            location = location.rsplit('/')[-1]
+            locations.append(location)
             print('"loc": "{}",'.format(location))
         elif line.startswith('PACKAGE SIZE (compressed):'):
             sizec = line.replace('PACKAGE SIZE (compressed):', '').strip()
