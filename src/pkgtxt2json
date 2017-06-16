@@ -9,10 +9,12 @@ import json
 
 def splitdeps(deps):
     splitdeps = deps.split(',')
-    for i in splitdeps:
-        i = i.strip()
+    for index, item in enumerate(splitdeps):
+        splitdeps[index] = item.strip()
+        if '|' in item:
+            splitdeps[index] = item.split('|')
     splitdeps[:] = [i for i in splitdeps if i != '']
-    return ','.join('"{0}"'.format(x) for x in splitdeps)
+    return splitdeps
 
 if len(sys.argv) != 2:
     print("ERROR: you have to provide the path to a PACKAGES.TXT file")
@@ -23,7 +25,6 @@ pkgtxt = sys.argv[1]
 if not os.path.isfile(pkgtxt):
     print("ERROR: file {} not found.".format(pkgtxt))
     sys.exit(1)
-
 
 # location descriptions
 locdesc = {
@@ -71,59 +72,56 @@ locdesc = {
 
 
 locations = []
-
-print('{"packages": [')
+pkgdict = {}
+pkgdict["packages"] = []
 
 with open(pkgtxt, "r") as f:
     readDescription1stLine = False
     readingDescription = False
-    firstOne = True
     pkgname = ''
     descriptionShort = ''
     descriptionLong = ''
+    pkg = {}
     for line in f:
         if line.startswith('PACKAGE NAME:'):
             readDescription1stLine = False
             readingDescription = False
             descriptionShort = ''
             descriptionLong = ''
-            if not firstOne:
-                print(",")
-            print('{')
-            firstOne = False
+            pkg = {}
             pkgNameFull = line.replace('PACKAGE NAME:', '')
             pkgNameFull = pkgNameFull.strip().rsplit('.', 1)[0].rsplit('-', 3)
             pkgname, pkgver, pkgarch, pkgrel = pkgNameFull
-            print('"name": "{}",'.format(pkgname))
-            print('"ver": "{}",'.format(pkgver))
-            print('"arch": "{}",'.format(pkgarch))
-            print('"rel": "{}",'.format(pkgrel))
+            pkg["name"] = pkgname
+            pkg["ver"] = pkgver
+            pkg["arch"] = pkgarch
+            pkg["rel"] = pkgrel
         elif line.startswith('PACKAGE LOCATION:'):
             location = line.replace('PACKAGE LOCATION:', '').strip()
             location = location.rsplit('/')[-1]
             locations.append(location)
-            print('"loc": "{}",'.format(location))
+            pkg["loc"] = location
         elif line.startswith('PACKAGE SIZE (compressed):'):
             sizec = line.replace('PACKAGE SIZE (compressed):', '').strip()
-            print('"sizec": "{}",'.format(sizec))
+            pkg["sizec"] = sizec
         elif line.startswith('PACKAGE SIZE (uncompressed):'):
             sizeu = line.replace('PACKAGE SIZE (uncompressed):', '').strip()
-            print('"sizeu": "{}",'.format(sizeu))
+            pkg["sizeu"] = sizeu
         elif line.startswith('PACKAGE REQUIRED:'):
             deps = line.replace('PACKAGE REQUIRED:', '').strip()
             deps = splitdeps(deps)
             if len(deps) > 0:
-                print('"deps": [{}],'.format(deps))
+                pkg["deps"] = deps
         elif line.startswith('PACKAGE CONFLICTS:'):
             deps = line.replace('PACKAGE CONFLICTS:', '').strip()
             deps = splitdeps(deps)
             if len(deps) > 0:
-                print('"con": [{}],'.format(deps))
+                pkg["con"] = deps
         elif line.startswith('PACKAGE SUGGESTS:'):
             deps = line.replace('PACKAGE SUGGESTS:', '').strip()
             deps = splitdeps(deps)
             if len(deps) > 0:
-                print('"sug": [{}],'.format(deps))
+                pkg["sug"] = deps
         elif line.startswith('PACKAGE DESCRIPTION:'):
             readingDescription = True
         elif line.startswith('{}:'.format(pkgname)):
@@ -134,26 +132,21 @@ with open(pkgtxt, "r") as f:
                     descriptionLong = descriptionLong + descline + ' '
                 else:
                     descriptionShort = descline
-                    print('"descs": "{}",'.format(descriptionShort))
+                    pkg["descs"] = descriptionShort
                     readDescription1stLine = True
         elif line == '\n':
             if readingDescription:
                 descriptionLong = descriptionLong.strip()
-                print('"descl": "{}"'.format(descriptionLong))
+                pkg["descl"] = descriptionLong
                 readingDescription = False
                 readDescription1stLine = False
-                print('}', end ='')
-
-print('],')
+                pkgdict["packages"].append(pkg)
 
 
 locations = set(locations)
 used_locations = {}
-print('"locations": ')
-
 for l in locations:
     used_locations[l] = locdesc[l]
+pkgdict["locations"] = used_locations
 
-print(json.dumps(used_locations))
-
-print('}')
+print(json.dumps(pkgdict))
