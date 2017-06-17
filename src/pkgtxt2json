@@ -96,6 +96,11 @@ with open(pkgtxt, "r") as f:
             pkg["ver"] = pkgver
             pkg["arch"] = pkgarch
             pkg["rel"] = pkgrel
+            pkg["descs"] = ""
+            pkg["descl"] = ""
+            pkg["loc"] = ""
+            pkg["sizec"] = ""
+            pkg["sizeu"] = ""
         elif line.startswith('PACKAGE LOCATION:'):
             location = line.replace('PACKAGE LOCATION:', '').strip()
             location = location.rsplit('/')[-1]
