@@ -67,7 +67,8 @@ locdesc = {
     "perl" : "Perl programming language tools and libraries",
     "python" : "Python programming language tools and libraries",
     "ruby" : "Ruby programming language tools and libraries",
-    "system" : "System software and tools"
+    "system" : "System software and tools",
+    "extra" : "Extra Slackware packages"
 }
 
 
@@ -103,7 +104,10 @@ with open(pkgtxt, "r") as f:
             pkg["sizeu"] = ""
         elif line.startswith('PACKAGE LOCATION:'):
             location = line.replace('PACKAGE LOCATION:', '').strip()
-            location = location.rsplit('/')[-1]
+            if location.startswith('./extra/'):
+                location = 'extra'
+            else:
+                location = location.rsplit('/')[-1]
             locations.append(location)
             pkg["loc"] = location
         elif line.startswith('PACKAGE SIZE (compressed):'):
