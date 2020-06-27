@@ -68,7 +68,8 @@ locdesc = {
     "python" : "Python programming language tools and libraries",
     "ruby" : "Ruby programming language tools and libraries",
     "system" : "System software and tools",
-    "extra" : "Extra Slackware packages"
+    "extra" : "Extra Slackware packages",
+    "patches" : "Slackware packages patches"
 }
 
 
@@ -106,6 +107,8 @@ with open(pkgtxt, "r") as f:
             location = line.replace('PACKAGE LOCATION:', '').strip()
             if location.startswith('./extra/'):
                 location = 'extra'
+            elif location.startswith('./patches/'):
+                location = 'patches'
             else:
                 location = location.rsplit('/')[-1]
             locations.append(location)
@@ -150,6 +153,7 @@ with open(pkgtxt, "r") as f:
                 readingDescription = False
                 readDescription1stLine = False
                 pkgdict["packages"].append(pkg)
+
 
 
 locations = set(locations)
