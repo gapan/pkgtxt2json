@@ -91,9 +91,9 @@ with open(pkgtxt, "r") as f:
             descriptionShort = ''
             descriptionLong = ''
             pkg = {}
-            pkgNameFull = line.replace('PACKAGE NAME:', '')
-            pkgNameFull = pkgNameFull.strip().rsplit('.', 1)[0].rsplit('-', 3)
-            pkgname, pkgver, pkgarch, pkgrel = pkgNameFull
+            pkgNameFull = line.replace('PACKAGE NAME:', '').strip()
+            pkgNameFullSplit = pkgNameFull.rsplit('.', 1)[0].rsplit('-', 3)
+            pkgname, pkgver, pkgarch, pkgrel = pkgNameFullSplit
             pkg["name"] = pkgname
             pkg["ver"] = pkgver
             pkg["arch"] = pkgarch
@@ -105,6 +105,8 @@ with open(pkgtxt, "r") as f:
             pkg["sizeu"] = ""
         elif line.startswith('PACKAGE LOCATION:'):
             location = line.replace('PACKAGE LOCATION:', '').strip()
+            pkg["path"] = location + '/' + pkgNameFull
+            pkg["source"] = "source/" + '/'.join(location.split('/')[1:]) + '/' + pkgname
             if location.startswith('./extra/'):
                 location = 'extra'
             elif location.startswith('./patches/'):
