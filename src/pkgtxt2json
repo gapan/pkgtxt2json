@@ -41,6 +41,7 @@ locdesc = {
     "l" : "Libraries",
     "locale" : "Localisation Packages",
     "lxde" : "LXDE packages",
+    "lxqt" : "The Lightweight Qt Desktop Environment",
     "mate" : "MATE Desktop Environment Packages",
     "n" : "Networking programs. Daemons, mail programs, telnet, news readers, web servers and so on",
     "t" : "teTeX document formatting system",
