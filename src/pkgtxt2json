@@ -70,7 +70,9 @@ locdesc = {
     "ruby" : "Ruby programming language tools and libraries",
     "system" : "System software and tools",
     "extra" : "Extra Slackware packages",
-    "patches" : "Slackware packages patches"
+    "." : "Extra Slackware packages",
+    "patches" : "Slackware packages patches",
+    "packages" : "Slackware packages patches"
 }
 
 
