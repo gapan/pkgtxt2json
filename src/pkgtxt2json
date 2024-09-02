@@ -109,7 +109,7 @@ with open(pkgtxt, "r") as f:
         elif line.startswith('PACKAGE LOCATION:'):
             location = line.replace('PACKAGE LOCATION:', '').strip()
             pkg["path"] = location + '/' + pkgNameFull
-            pkg["source"] = "source/" + '/'.join(location.split('/')[1:]) + '/' + pkgname
+            pkg["source"] = "source/" + '/'.join(location.split('/')[2:]) + '/' + pkgname
             if location.startswith('./extra/'):
                 location = 'extra'
             elif location.startswith('./patches/'):
