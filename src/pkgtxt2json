@@ -80,7 +80,7 @@ locations = []
 pkgdict = {}
 pkgdict["packages"] = []
 
-with open(pkgtxt, "r") as f:
+with open(pkgtxt, "r", encoding="utf8", errors="ignore") as f:
     readDescription1stLine = False
     readingDescription = False
     pkgname = ''
